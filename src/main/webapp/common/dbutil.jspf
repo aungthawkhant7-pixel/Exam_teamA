@@ -1,0 +1,19 @@
+<%@ page import="java.sql.*,javax.naming.*,javax.sql.DataSource,java.util.*,bean.Teacher,bean.Student,bean.ClassNum" %>
+<%!
+private Connection getDbConnection() throws Exception {
+    InitialContext ic = new InitialContext();
+    DataSource ds = (DataSource) ic.lookup("java:/comp/env/jdbc/exam");
+    return ds.getConnection();
+}
+private void ensureAssumedTables(Connection con) throws SQLException {
+    try (Statement st = con.createStatement()) {
+        st.execute("CREATE TABLE IF NOT EXISTS SUBJECT (CD VARCHAR(20) NOT NULL, NAME VARCHAR(100) NOT NULL, SCHOOL_CD VARCHAR(20) NOT NULL, PRIMARY KEY(CD, SCHOOL_CD))");
+        st.execute("CREATE TABLE IF NOT EXISTS TEST_SCORE (ID BIGINT AUTO_INCREMENT PRIMARY KEY, STUDENT_NO VARCHAR(20) NOT NULL, SUBJECT_CD VARCHAR(20) NOT NULL, TEST_NO INT NOT NULL, POINT INT NOT NULL, SCHOOL_CD VARCHAR(20) NOT NULL)");
+        st.execute("CREATE UNIQUE INDEX IF NOT EXISTS IDX_TEST_SCORE_UNQ ON TEST_SCORE(STUDENT_NO, SUBJECT_CD, TEST_NO, SCHOOL_CD)");
+    }
+}
+private String nv(String s) { return s == null ? "" : s; }
+private int toInt(String s, int def) {
+    try { return Integer.parseInt(s); } catch (Exception e) { return def; }
+}
+%>
