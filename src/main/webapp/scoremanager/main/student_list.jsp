@@ -456,7 +456,7 @@ request.setAttribute("checkedAttend", checkedAttend);
             </c:if>
 
             <div class="card netflix-card mx-1 mb-4">
-                <div class="card-header">${empty originalNo ? '学生登録' : '学生更新'}</div>
+                <div class="card-header">${empty originalNo ? '学生情報登録' : '学生更新'}</div>
                 <div class="card-body">
                     <form id="studentForm" action="${pageContext.request.contextPath}/scoremanager/main/student_list.jsp" method="post" class="row g-3">
                         <input type="hidden" name="formAction" value="save">
