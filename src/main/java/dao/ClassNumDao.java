@@ -10,10 +10,38 @@ import bean.ClassNum;
 
 public class ClassNumDao extends Dao {
 
-    public ClassNum get(String classNum, String schoolCd) throws Exception {
-        ClassNum cn = null;
+    public List<ClassNum> filter(String schoolCd) throws Exception {
+        List<ClassNum> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM CLASS_NUM WHERE CLASS_NUM = ? AND SCHOOL_CD = ?";
+        String sql =
+            "SELECT c.CLASS_NUM, c.SCHOOL_CD, " +
+            "(SELECT COUNT(*) FROM STUDENT s " +
+            "WHERE s.CLASS_NUM = c.CLASS_NUM AND s.SCHOOL_CD = c.SCHOOL_CD) AS STUDENT_COUNT " +
+            "FROM CLASS_NUM c " +
+            "WHERE c.SCHOOL_CD = ? " +
+            "ORDER BY c.CLASS_NUM";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, schoolCd);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    ClassNum c = new ClassNum();
+                    c.setClassNum(rs.getString("CLASS_NUM"));
+                    c.setSchoolCd(rs.getString("SCHOOL_CD"));
+                    c.setStudentCount(rs.getInt("STUDENT_COUNT"));
+                    list.add(c);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    public boolean insert(String classNum, String schoolCd) throws Exception {
+        String sql = "INSERT INTO CLASS_NUM(CLASS_NUM, SCHOOL_CD) VALUES (?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -21,36 +49,39 @@ public class ClassNumDao extends Dao {
             st.setString(1, classNum);
             st.setString(2, schoolCd);
 
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                cn = new ClassNum();
-                cn.setClassNum(rs.getString("CLASS_NUM"));
-                cn.setSchoolCd(rs.getString("SCHOOL_CD"));
-            }
+            return st.executeUpdate() > 0;
         }
-
-        return cn;
     }
 
-    public List<ClassNum> filter(String schoolCd) throws Exception {
-        List<ClassNum> list = new ArrayList<>();
-
-        String sql = "SELECT * FROM CLASS_NUM WHERE SCHOOL_CD = ? ORDER BY CLASS_NUM";
+    public int countStudents(String classNum, String schoolCd) throws Exception {
+        String sql = "SELECT COUNT(*) FROM STUDENT WHERE CLASS_NUM = ? AND SCHOOL_CD = ?";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setString(1, schoolCd);
-            ResultSet rs = st.executeQuery();
+            st.setString(1, classNum);
+            st.setString(2, schoolCd);
 
-            while (rs.next()) {
-                ClassNum cn = new ClassNum();
-                cn.setClassNum(rs.getString("CLASS_NUM"));
-                cn.setSchoolCd(rs.getString("SCHOOL_CD"));
-                list.add(cn);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         }
 
-        return list;
+        return 0;
+    }
+
+    public boolean delete(String classNum, String schoolCd) throws Exception {
+        String sql = "DELETE FROM CLASS_NUM WHERE CLASS_NUM = ? AND SCHOOL_CD = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, classNum);
+            st.setString(2, schoolCd);
+
+            return st.executeUpdate() > 0;
+        }
     }
 }
