@@ -1,7 +1,11 @@
 package dao;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import bean.Student;
 
 public class StudentDao extends Dao {
@@ -17,35 +21,57 @@ public class StudentDao extends Dao {
         return s;
     }
 
-    public List<Student> filter(String entYear, String classNum, String schoolCd, boolean isAttend) throws Exception {
+    public Student get(String no) throws Exception {
+        Student student = null;
+
+        String sql = "SELECT * FROM STUDENT WHERE NO = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, no);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    student = postFilter(rs);
+                }
+            }
+        }
+
+        return student;
+    }
+
+    public List<Student> filter(String schoolCd, Integer entYear, String classNum, boolean isAttend) throws Exception {
         List<Student> list = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM STUDENT WHERE SCHOOL_CD = ?");
-        params.add(schoolCd);
+        String sql = "SELECT * FROM STUDENT WHERE SCHOOL_CD = ?";
 
-        if (entYear != null && !entYear.isEmpty()) {
-            sql.append(" AND ENT_YEAR = ?");
-            params.add(Integer.parseInt(entYear));
+        if (entYear != null) {
+            sql += " AND ENT_YEAR = ?";
         }
 
         if (classNum != null && !classNum.isEmpty()) {
-            sql.append(" AND CLASS_NUM = ?");
-            params.add(classNum);
+            sql += " AND CLASS_NUM = ?";
         }
 
         if (isAttend) {
-            sql.append(" AND IS_ATTEND = ?");
-            params.add(true);
+            sql += " AND IS_ATTEND = TRUE";
         }
 
-        sql.append(" ORDER BY ENT_YEAR DESC, NO");
+        sql += " ORDER BY ENT_YEAR DESC, NO";
 
         try (Connection con = getConnection();
-             PreparedStatement st = con.prepareStatement(sql.toString())) {
+             PreparedStatement st = con.prepareStatement(sql)) {
 
-            for (int i = 0; i < params.size(); i++) {
-                st.setObject(i + 1, params.get(i));
+            int index = 1;
+            st.setString(index++, schoolCd);
+
+            if (entYear != null) {
+                st.setInt(index++, entYear);
+            }
+
+            if (classNum != null && !classNum.isEmpty()) {
+                st.setString(index++, classNum);
             }
 
             try (ResultSet rs = st.executeQuery()) {
@@ -58,91 +84,80 @@ public class StudentDao extends Dao {
         return list;
     }
 
-    public Student get(String no, String schoolCd) throws Exception {
-        Student s = null;
+    public List<Integer> filterEntYear(String schoolCd) throws Exception {
+        List<Integer> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM STUDENT WHERE NO = ? AND SCHOOL_CD = ?";
+        String sql = "SELECT DISTINCT ENT_YEAR FROM STUDENT WHERE SCHOOL_CD = ? ORDER BY ENT_YEAR DESC";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setString(1, no);
-            st.setString(2, schoolCd);
+            st.setString(1, schoolCd);
 
             try (ResultSet rs = st.executeQuery()) {
-                if (rs.next()) {
-                    s = postFilter(rs);
+                while (rs.next()) {
+                    list.add(rs.getInt("ENT_YEAR"));
                 }
             }
         }
 
-        return s;
+        return list;
     }
 
-    public boolean insert(Student s) throws Exception {
+    public List<String> filterClassNum(String schoolCd) throws Exception {
+        List<String> list = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT CLASS_NUM FROM STUDENT WHERE SCHOOL_CD = ? ORDER BY CLASS_NUM";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, schoolCd);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getString("CLASS_NUM"));
+                }
+            }
+        }
+
+        return list;
+    }
+
+    public boolean update(Student student) throws Exception {
+        String sql = "UPDATE STUDENT SET NAME = ?, ENT_YEAR = ?, CLASS_NUM = ?, IS_ATTEND = ? WHERE NO = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, student.getName());
+            st.setInt(2, student.getEntYear());
+            st.setString(3, student.getClassNum());
+            st.setBoolean(4, student.isAttend());
+            st.setString(5, student.getNo());
+
+            int count = st.executeUpdate();
+
+            return count > 0;
+        }
+    }
+
+    public boolean save(Student student) throws Exception {
         String sql = "INSERT INTO STUDENT(NO, NAME, ENT_YEAR, CLASS_NUM, IS_ATTEND, SCHOOL_CD) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setString(1, s.getNo());
-            st.setString(2, s.getName());
-            st.setInt(3, s.getEntYear());
-            st.setString(4, s.getClassNum());
-            st.setBoolean(5, s.isAttend());
-            st.setString(6, s.getSchoolCd());
+            st.setString(1, student.getNo());
+            st.setString(2, student.getName());
+            st.setInt(3, student.getEntYear());
+            st.setString(4, student.getClassNum());
+            st.setBoolean(5, student.isAttend());
+            st.setString(6, student.getSchoolCd());
 
-            return st.executeUpdate() > 0;
+            int count = st.executeUpdate();
+
+            return count > 0;
         }
-    }
-
-    public boolean update(Student s, String originalNo) throws Exception {
-        String sql = "UPDATE STUDENT SET NO = ?, NAME = ?, ENT_YEAR = ?, CLASS_NUM = ?, IS_ATTEND = ? WHERE NO = ? AND SCHOOL_CD = ?";
-
-        try (Connection con = getConnection();
-             PreparedStatement st = con.prepareStatement(sql)) {
-
-            st.setString(1, s.getNo());
-            st.setString(2, s.getName());
-            st.setInt(3, s.getEntYear());
-            st.setString(4, s.getClassNum());
-            st.setBoolean(5, s.isAttend());
-            st.setString(6, originalNo);
-            st.setString(7, s.getSchoolCd());
-
-            return st.executeUpdate() > 0;
-        }
-    }
-
-    public boolean delete(String no, String schoolCd) throws Exception {
-        int count = 0;
-
-        try (Connection con = getConnection()) {
-            con.setAutoCommit(false);
-
-            try {
-                try (PreparedStatement st = con.prepareStatement(
-                        "DELETE FROM TEST_SCORE WHERE STUDENT_NO = ? AND SCHOOL_CD = ?")) {
-                    st.setString(1, no);
-                    st.setString(2, schoolCd);
-                    st.executeUpdate();
-                }
-
-                try (PreparedStatement st = con.prepareStatement(
-                        "DELETE FROM STUDENT WHERE NO = ? AND SCHOOL_CD = ?")) {
-                    st.setString(1, no);
-                    st.setString(2, schoolCd);
-                    count = st.executeUpdate();
-                }
-
-                con.commit();
-
-            } catch (Exception e) {
-                con.rollback();
-                throw e;
-            }
-        }
-
-        return count > 0;
     }
 }
