@@ -43,7 +43,7 @@
 					<div class="card h-100">
 						<div class="card-body">
 							<h5 class="card-title">科目管理</h5>
-							<a href="${pageContext.request.contextPath}/scoremanager/main/subject_list.jsp">科目管理</a>
+							<a href="${pageContext.request.contextPath}/SubjectList.action">科目管理</a>
 						</div>
 					</div>
 				</div>
