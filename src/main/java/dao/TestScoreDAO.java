@@ -14,7 +14,7 @@ public class TestScoreDAO extends Dao {
         List<String> list = new ArrayList<>();
 
         String sql = "SELECT DISTINCT ENT_YEAR FROM STUDENT "
-                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) AND IS_ATTEND=TRUE "
+                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) "
                    + "ORDER BY ENT_YEAR DESC";
 
         try (Connection con = getConnection();
@@ -35,7 +35,7 @@ public class TestScoreDAO extends Dao {
         List<String> list = new ArrayList<>();
 
         String sql = "SELECT DISTINCT CLASS_NUM FROM STUDENT "
-                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) AND IS_ATTEND=TRUE "
+                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) "
                    + "ORDER BY CLASS_NUM";
 
         try (Connection con = getConnection();
@@ -56,7 +56,8 @@ public class TestScoreDAO extends Dao {
         List<Map<String, String>> list = new ArrayList<>();
 
         String sql = "SELECT CD, NAME FROM SUBJECT "
-                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) ORDER BY CD";
+                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) "
+                   + "ORDER BY CD";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -75,9 +76,30 @@ public class TestScoreDAO extends Dao {
         return list;
     }
 
+    public String getSubjectName(String schoolCd, String subjectCd) throws Exception {
+        String sql = "SELECT NAME FROM SUBJECT "
+                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) "
+                   + "AND TRIM(CD)=TRIM(?)";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, schoolCd);
+            st.setString(2, subjectCd);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("NAME");
+                }
+            }
+        }
+        return "";
+    }
+
     public String getStudentName(String schoolCd, String studentNo) throws Exception {
         String sql = "SELECT NAME FROM STUDENT "
-                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) AND TRIM(NO)=TRIM(?)";
+                   + "WHERE TRIM(SCHOOL_CD)=TRIM(?) "
+                   + "AND TRIM(NO)=TRIM(?)";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -94,7 +116,6 @@ public class TestScoreDAO extends Dao {
         return null;
     }
 
-    // 学生検索結果用：科目名 / 科目コード / 回数 / 点数
     public List<Map<String, String>> getStudentScores(String schoolCd, String studentNo) throws Exception {
         List<Map<String, String>> list = new ArrayList<>();
 
@@ -116,13 +137,10 @@ public class TestScoreDAO extends Dao {
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     Map<String, String> row = new HashMap<>();
-                    String subName = rs.getString("SUBJECT_NAME");
-                    String subCd   = rs.getString("SUBJECT_CD");
-
-                    row.put("subjectName", subName != null ? subName : "");
-                    row.put("subjectCd",   subCd   != null ? subCd.trim() : "");
-                    row.put("testNo",      rs.getString("TEST_NO"));
-                    row.put("point",       rs.getString("POINT"));
+                    row.put("subjectName", rs.getString("SUBJECT_NAME"));
+                    row.put("subjectCd", rs.getString("SUBJECT_CD"));
+                    row.put("testNo", rs.getString("TEST_NO"));
+                    row.put("point", rs.getString("POINT"));
                     list.add(row);
                 }
             }
@@ -130,15 +148,14 @@ public class TestScoreDAO extends Dao {
         return list;
     }
 
-    // 科目検索結果用：入学年度 / クラス / 学生番号 / 氏名 / 点数
     public List<Map<String, String>> getSubjectScores(
             String schoolCd, String entYear, String classNum, String subjectCd) throws Exception {
 
         List<Map<String, String>> list = new ArrayList<>();
 
         String sql =
-            "SELECT ST.ENT_YEAR, ST.CLASS_NUM, ST.NO AS STUDENT_NO, ST.NAME AS STUDENT_NAME, " +
-            "TS.POINT " +
+            "SELECT ST.ENT_YEAR, ST.CLASS_NUM, ST.NO AS STUDENT_NO, " +
+            "ST.NAME AS STUDENT_NAME, TS.TEST_NO, TS.POINT " +
             "FROM TEST_SCORE TS " +
             "LEFT JOIN STUDENT ST ON TRIM(TS.STUDENT_NO)=TRIM(ST.NO) " +
             "AND TRIM(TS.SCHOOL_CD)=TRIM(ST.SCHOOL_CD) " +
@@ -146,7 +163,7 @@ public class TestScoreDAO extends Dao {
             "AND TRIM(ST.ENT_YEAR)=TRIM(?) " +
             "AND TRIM(ST.CLASS_NUM)=TRIM(?) " +
             "AND TRIM(TS.SUBJECT_CD)=TRIM(?) " +
-            "ORDER BY ST.NO";
+            "ORDER BY ST.NO, TS.TEST_NO";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -159,11 +176,12 @@ public class TestScoreDAO extends Dao {
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     Map<String, String> row = new HashMap<>();
-                    row.put("entYear",     rs.getString("ENT_YEAR"));
-                    row.put("classNum",    rs.getString("CLASS_NUM"));
-                    row.put("studentNo",   rs.getString("STUDENT_NO"));
+                    row.put("entYear", rs.getString("ENT_YEAR"));
+                    row.put("classNum", rs.getString("CLASS_NUM"));
+                    row.put("studentNo", rs.getString("STUDENT_NO"));
                     row.put("studentName", rs.getString("STUDENT_NAME"));
-                    row.put("point",       rs.getString("POINT"));
+                    row.put("testNo", rs.getString("TEST_NO"));
+                    row.put("point", rs.getString("POINT"));
                     list.add(row);
                 }
             }
