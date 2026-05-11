@@ -52,7 +52,7 @@
 					<div class="card h-100">
 						<div class="card-body">
 							<h5 class="card-title">クラス管理</h5>
-							<a href="${pageContext.request.contextPath}/scoremanager/main/class_list.jsp">クラス管理</a>
+							<a href="${pageContext.request.contextPath}/ClassList.action">クラス管理</a>
 						</div>
 					</div>
 				</div>
