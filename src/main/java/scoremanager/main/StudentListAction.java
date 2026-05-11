@@ -1,5 +1,6 @@
 package scoremanager.main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bean.Student;
@@ -39,7 +40,10 @@ public class StudentListAction extends Action {
         StudentDao dao = new StudentDao();
 
         List<Student> students = dao.filter(schoolCd, entYear, classNum, isAttend);
-        List<Integer> entYearSet = dao.filterEntYear(schoolCd);
+        List<Integer> entYearSet=new ArrayList<>();
+        for (int y=2017; y<=2025; y++) {
+        	entYearSet.add(y);
+        }
         List<String> classNumSet = dao.filterClassNum(schoolCd);
 
         // set JSP data
