@@ -14,7 +14,7 @@
 
             <div class="px-4">
 
-                <!-- 科目情報検索 スーさん -->
+                <!-- 科目情報検索 -->
                 <form action="${pageContext.request.contextPath}/TestList.action"
                       method="post"
                       class="mb-3">
@@ -29,7 +29,7 @@
                         <div class="col-md-2">
                             <label class="form-label">入学年度</label>
                             <select name="entYear" class="form-select">
-                                <option value="">--------</option>
+                                <option value="">----</option>
                                 <c:forEach var="year" items="${entYearSet}">
                                     <option value="${year}"
                                         <c:if test="${year == entYear}">selected</c:if>>
@@ -42,7 +42,7 @@
                         <div class="col-md-2">
                             <label class="form-label">クラス</label>
                             <select name="classNum" class="form-select">
-                                <option value="">--------</option>
+                                <option value="">----</option>
                                 <c:forEach var="num" items="${classNumSet}">
                                     <option value="${num}"
                                         <c:if test="${num == classNum}">selected</c:if>>
@@ -65,10 +65,8 @@
                             </select>
                         </div>
 
-                        <div class="col-md-1">
-                            <button class="btn btn-secondary" type="submit">
-                                検索
-                            </button>
+                        <div class="col-md-auto">
+                            <button class="btn btn-secondary" type="submit">検索</button>
                         </div>
                     </div>
                 </form>
@@ -94,17 +92,15 @@
                                    placeholder="学生番号を入力してください">
                         </div>
 
-                        <div class="col-md-1">
-                            <button class="btn btn-secondary" type="submit">
-                                検索
-                            </button>
+                        <div class="col-md-auto">
+                            <button class="btn btn-secondary" type="submit">検索</button>
                         </div>
                     </div>
                 </form>
 
                 <!-- メッセージ -->
                 <c:if test="${empty errorMsg and empty studentRows and empty subjectRows}">
-                    <p style="color:#00bfff;">
+                    <p class="text-info">
                         科目情報を選択または学生情報を入力して検索ボタンをクリックしてください
                     </p>
                 </c:if>
@@ -116,15 +112,6 @@
                 </c:if>
 
                 <!-- 学生検索結果 -->
-                <c:if test="${not empty studentName and empty studentRows and empty errorMsg}">
-                    <p class="mb-2">
-                        氏名：${studentName} (${studentNo})
-                    </p>
-                    <p>
-                        成績情報が存在しませんでした
-                    </p>
-                </c:if>
-
                 <c:if test="${not empty studentRows}">
                     <p class="mb-2">
                         氏名：${studentName} (${studentNo})

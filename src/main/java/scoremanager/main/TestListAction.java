@@ -23,29 +23,26 @@ public class TestListAction extends Action {
 
         String schoolCd = user.getSchoolCd();
 
-        String entYear = nv(req.getParameter("entYear"));
-        String classNum = nv(req.getParameter("classNum"));
-        String subjectCd = nv(req.getParameter("subjectCd"));
-        String studentNo = nv(req.getParameter("studentNo"));
+        String entYear    = nv(req.getParameter("entYear"));
+        String classNum   = nv(req.getParameter("classNum"));
+        String subjectCd  = nv(req.getParameter("subjectCd"));
+        String studentNo  = nv(req.getParameter("studentNo"));
         String searchType = nv(req.getParameter("searchType"));
 
-        String pageTitle = "成績参照";
-        String errorMsg = "";
-        String infoMsg = "科目情報を選択または学生情報を入力して検索ボタンをクリックしてください";
-        String subjectName = "";
+        String errorMsg    = "";
         String studentName = "";
 
         List<Map<String, String>> studentRows = new ArrayList<>();
+        List<Map<String, String>> subjectRows = new ArrayList<>();
 
         TestScoreDAO dao = new TestScoreDAO();
 
-        List<String> entYears = dao.getEntYears(schoolCd);
-        List<String> classNums = dao.getClassNums(schoolCd);
-        List<Map<String, String>> subjects = dao.getSubjects(schoolCd);
+        List<String>              entYearSet  = dao.getEntYears(schoolCd);
+        List<String>              classNumSet = dao.getClassNums(schoolCd);
+        List<Map<String, String>> subjectSet  = dao.getSubjects(schoolCd);
 
+        // 学生情報検索
         if ("student".equals(searchType)) {
-            pageTitle = "成績一覧（学生）";
-            infoMsg = "";
 
             if (studentNo.isEmpty()) {
                 errorMsg = "学生番号を入力してください";
@@ -56,25 +53,41 @@ public class TestListAction extends Action {
                     errorMsg = "学生情報が存在しませんでした";
                 } else {
                     studentRows = dao.getStudentScores(schoolCd, studentNo);
+                    if (studentRows.isEmpty()) {
+                        errorMsg = "成績情報が存在しませんでした";
+                    }
                 }
             }
         }
 
-        req.setAttribute("entYears", entYears);
-        req.setAttribute("classNums", classNums);
-        req.setAttribute("subjects", subjects);
+        // 科目情報検索
+        if ("subject".equals(searchType)) {
 
-        req.setAttribute("entYear", entYear);
-        req.setAttribute("classNum", classNum);
-        req.setAttribute("subjectCd", subjectCd);
-        req.setAttribute("studentNo", studentNo);
+            if (entYear.isEmpty() || classNum.isEmpty() || subjectCd.isEmpty()) {
+                errorMsg = "入学年度とクラスと科目を選択してください";
+            } else {
+                subjectRows = dao.getSubjectScores(schoolCd, entYear, classNum, subjectCd);
 
-        req.setAttribute("pageTitle", pageTitle);
-        req.setAttribute("errorMsg", errorMsg);
-        req.setAttribute("infoMsg", infoMsg);
-        req.setAttribute("subjectName", subjectName);
+                if (subjectRows.isEmpty()) {
+                    errorMsg = "成績情報が存在しませんでした";
+                }
+            }
+        }
+
+        req.setAttribute("entYearSet",  entYearSet);
+        req.setAttribute("classNumSet", classNumSet);
+        req.setAttribute("subjectSet",  subjectSet);
+
+        req.setAttribute("entYear",    entYear);
+        req.setAttribute("classNum",   classNum);
+        req.setAttribute("subjectCd",  subjectCd);
+        req.setAttribute("studentNo",  studentNo);
+        req.setAttribute("searchType", searchType);
+
+        req.setAttribute("errorMsg",    errorMsg);
         req.setAttribute("studentName", studentName);
         req.setAttribute("studentRows", studentRows);
+        req.setAttribute("subjectRows", subjectRows);
 
         return "/scoremanager/main/test_list.jsp";
     }
