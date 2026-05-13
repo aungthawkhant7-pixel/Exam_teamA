@@ -161,6 +161,7 @@
                                     <td>${r.point}</td>
                                 </tr>
                             </c:forEach>
+                            
                         </tbody>
                     </table>
                 </c:if>
