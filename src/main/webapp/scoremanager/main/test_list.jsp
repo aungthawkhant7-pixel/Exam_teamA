@@ -14,7 +14,6 @@
 
             <div class="px-4">
 
-                <!-- 科目情報検索 -->
                 <form action="${pageContext.request.contextPath}/TestList.action"
                       method="post"
                       class="mb-3">
@@ -29,10 +28,9 @@
                         <div class="col-md-2">
                             <label class="form-label">入学年度</label>
                             <select name="entYear" class="form-select">
-                                <option value="">----</option>
-                                <c:forEach var="year" items="${entYearSet}">
-                                    <option value="${year}"
-                                        <c:if test="${year == entYear}">selected</c:if>>
+                                <option value="">--------</option>
+                                <c:forEach var="year" items="${entYears}">
+                                    <option value="${year}" <c:if test="${year == entYear}">selected</c:if>>
                                         ${year}
                                     </option>
                                 </c:forEach>
@@ -42,10 +40,9 @@
                         <div class="col-md-2">
                             <label class="form-label">クラス</label>
                             <select name="classNum" class="form-select">
-                                <option value="">----</option>
-                                <c:forEach var="num" items="${classNumSet}">
-                                    <option value="${num}"
-                                        <c:if test="${num == classNum}">selected</c:if>>
+                                <option value="">--------</option>
+                                <c:forEach var="num" items="${classNums}">
+                                    <option value="${num}" <c:if test="${num == classNum}">selected</c:if>>
                                         ${num}
                                     </option>
                                 </c:forEach>
@@ -56,22 +53,22 @@
                             <label class="form-label">科目</label>
                             <select name="subjectCd" class="form-select">
                                 <option value="">----------</option>
-                                <c:forEach var="subject" items="${subjectSet}">
-                                    <option value="${subject.cd}"
-                                        <c:if test="${subject.cd == subjectCd}">selected</c:if>>
+                                <c:forEach var="subject" items="${subjects}">
+                                    <option value="${subject.cd}" <c:if test="${subject.cd == subjectCd}">selected</c:if>>
                                         ${subject.name}
                                     </option>
                                 </c:forEach>
                             </select>
                         </div>
 
-                        <div class="col-md-auto">
-                            <button class="btn btn-secondary" type="submit">検索</button>
+                        <div class="col-md-1">
+                            <button class="btn btn-secondary" type="submit">
+                                検索
+                            </button>
                         </div>
                     </div>
                 </form>
 
-                <!-- 学生情報検索 -->
                 <form action="${pageContext.request.contextPath}/TestList.action"
                       method="post"
                       class="mb-3">
@@ -92,15 +89,16 @@
                                    placeholder="学生番号を入力してください">
                         </div>
 
-                        <div class="col-md-auto">
-                            <button class="btn btn-secondary" type="submit">検索</button>
+                        <div class="col-md-1">
+                            <button class="btn btn-secondary" type="submit">
+                                検索
+                            </button>
                         </div>
                     </div>
                 </form>
 
-                <!-- メッセージ -->
                 <c:if test="${empty errorMsg and empty studentRows and empty subjectRows}">
-                    <p class="text-info">
+                    <p style="color:#00bfff;">
                         科目情報を選択または学生情報を入力して検索ボタンをクリックしてください
                     </p>
                 </c:if>
@@ -111,7 +109,13 @@
                     </p>
                 </c:if>
 
-                <!-- 学生検索結果 -->
+                <c:if test="${not empty studentName and empty studentRows and empty errorMsg}">
+                    <p class="mb-2">
+                        氏名：${studentName} (${studentNo})
+                    </p>
+                    <p>成績情報が存在しませんでした</p>
+                </c:if>
+
                 <c:if test="${not empty studentRows}">
                     <p class="mb-2">
                         氏名：${studentName} (${studentNo})
@@ -139,8 +143,11 @@
                     </table>
                 </c:if>
 
-                <!-- 科目検索結果 -->
                 <c:if test="${not empty subjectRows}">
+                    <p class="mb-2">
+                        科目：${subjectName}
+                    </p>
+
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -148,6 +155,7 @@
                                 <th>クラス</th>
                                 <th>学生番号</th>
                                 <th>氏名</th>
+                                <th>回数</th>
                                 <th>点数</th>
                             </tr>
                         </thead>
@@ -158,6 +166,7 @@
                                     <td>${r.classNum}</td>
                                     <td>${r.studentNo}</td>
                                     <td>${r.studentName}</td>
+                                    <td>${r.testNo}</td>
                                     <td>${r.point}</td>
                                 </tr>
                             </c:forEach>
