@@ -29,13 +29,12 @@ public class TestListAction extends Action {
         String studentNo = nv(req.getParameter("studentNo"));
         String searchType = nv(req.getParameter("searchType"));
 
-        String pageTitle = "成績参照";
         String errorMsg = "";
-        String infoMsg = "科目情報を選択または学生情報を入力して検索ボタンをクリックしてください";
-        String subjectName = "";
         String studentName = "";
+        String subjectName = "";
 
         List<Map<String, String>> studentRows = new ArrayList<>();
+        List<Map<String, String>> subjectRows = new ArrayList<>();
 
         TestScoreDAO dao = new TestScoreDAO();
 
@@ -43,9 +42,12 @@ public class TestListAction extends Action {
         List<String> classNums = dao.getClassNums(schoolCd);
         List<Map<String, String>> subjects = dao.getSubjects(schoolCd);
 
+        System.out.println("schoolCd = " + schoolCd);
+        System.out.println("entYears = " + entYears);
+        System.out.println("classNums = " + classNums);
+        System.out.println("subjects = " + subjects);
+
         if ("student".equals(searchType)) {
-            pageTitle = "成績一覧（学生）";
-            infoMsg = "";
 
             if (studentNo.isEmpty()) {
                 errorMsg = "学生番号を入力してください";
@@ -58,6 +60,15 @@ public class TestListAction extends Action {
                     studentRows = dao.getStudentScores(schoolCd, studentNo);
                 }
             }
+
+        } else if ("subject".equals(searchType)) {
+
+            if (entYear.isEmpty() || classNum.isEmpty() || subjectCd.isEmpty()) {
+                errorMsg = "入学年度、クラス、科目を選択してください";
+            } else {
+                subjectName = dao.getSubjectName(schoolCd, subjectCd);
+                subjectRows = dao.getSubjectScores(schoolCd, entYear, classNum, subjectCd);
+            }
         }
 
         req.setAttribute("entYears", entYears);
@@ -69,12 +80,11 @@ public class TestListAction extends Action {
         req.setAttribute("subjectCd", subjectCd);
         req.setAttribute("studentNo", studentNo);
 
-        req.setAttribute("pageTitle", pageTitle);
         req.setAttribute("errorMsg", errorMsg);
-        req.setAttribute("infoMsg", infoMsg);
-        req.setAttribute("subjectName", subjectName);
         req.setAttribute("studentName", studentName);
+        req.setAttribute("subjectName", subjectName);
         req.setAttribute("studentRows", studentRows);
+        req.setAttribute("subjectRows", subjectRows);
 
         return "/scoremanager/main/test_list.jsp";
     }
