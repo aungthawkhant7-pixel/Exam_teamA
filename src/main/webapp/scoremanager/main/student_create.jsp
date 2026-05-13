@@ -14,6 +14,13 @@
         <label class="form-label">入学年度</label>
         <select name="entYear" class="form-select" required>
             <option value="">--------</option>
+            <option value="2016" ${entYear == '2016' ? 'selected' : ''}>2016</option>
+            <option value="2017" ${entYear == '2017' ? 'selected' : ''}>2017</option>
+            <option value="2018" ${entYear == '2018' ? 'selected' : ''}>2018</option>
+            <option value="2019" ${entYear == '2019' ? 'selected' : ''}>2019</option>
+            <option value="2020" ${entYear == '2020' ? 'selected' : ''}>2020</option>
+            <option value="2021" ${entYear == '2021' ? 'selected' : ''}>2021</option>
+            <option value="2022" ${entYear == '2022' ? 'selected' : ''}>2022</option>
             <option value="2023" ${entYear == '2023' ? 'selected' : ''}>2023</option>
             <option value="2024" ${entYear == '2024' ? 'selected' : ''}>2024</option>
             <option value="2025" ${entYear == '2025' ? 'selected' : ''}>2025</option>
