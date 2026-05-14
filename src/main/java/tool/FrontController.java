@@ -11,38 +11,48 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("*.action")
 public class FrontController extends HttpServlet {
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
 
-		try {
-			String path = req.getServletPath();
-			// 例: /LoginExecute.action
+        try {
 
-			String name = path.substring(1, path.lastIndexOf(".action"));
-			// => LoginExecute
+            // URL取得
+            // 例: /scoremanager/main/TestList.action
+            String path = req.getServletPath();
 
-			String className = "scoremanager.main." + name + "Action";
-			// => scoremanager.main.LoginExecuteAction
+            // Action名取得
+            // => TestList
+            String name = path.substring(
+                    path.lastIndexOf("/") + 1,
+                    path.lastIndexOf(".action"));
 
-			Action action = (Action) Class.forName(className)
-					.getDeclaredConstructor()
-					.newInstance();
+            // クラス名作成
+            // => scoremanager.main.TestListAction
+            String className = "scoremanager.main." + name + "Action";
 
-			String url = action.execute(req, res);
+            // Action生成
+            Action action = (Action) Class.forName(className)
+                    .getDeclaredConstructor()
+                    .newInstance();
 
-			if (url != null) {
-				req.getRequestDispatcher("/" + url).forward(req, res);
-			}
+            // execute実行
+            String url = action.execute(req, res);
 
-		} catch (Exception e) {
-			throw new ServletException(e);
-		}
-	}
+            // JSPへ遷移
+            if (url != null) {
+                req.getRequestDispatcher(url).forward(req, res);
+            }
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
-		doGet(req, res);
-	}
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+
+        doGet(req, res);
+    }
 }

@@ -16,7 +16,7 @@
 
 <a href="${pageContext.request.contextPath}/scoremanager/main/test_regist.jsp">戻る</a>
 　　　
-<a href="StudentList.action">成績参照</a>
-
+<!-- 成績参照 -->
+<a href="TestList.action">成績参照</a>
 </c:param>
 </c:import>
