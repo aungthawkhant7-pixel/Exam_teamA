@@ -197,12 +197,7 @@ request.setAttribute("subjectName", subjectName);
 <section class="me-4">
 <h2 class="h3 mb-3 fw-normal bg-secondary bg-opacity-10 py-2 px-4">成績管理</h2>
  
-            <c:if test="${not empty flash}">
-<div class="alert alert-success mx-4">${flash}</div>
-</c:if>
-<c:if test="${not empty errorMsg}">
-<div class="alert alert-danger mx-4">${errorMsg}</div>
-</c:if>
+
  
             <div class="card mx-4 mb-4">
 <div class="card-body">
@@ -288,10 +283,14 @@ request.setAttribute("subjectName", subjectName);
 </td>
 <td>${r.studentName}</td>
 <td>
-<input type="number" min="0" max="100" class="form-control" name="point_${r.studentNo}" value="${r.point}">
+<input type="text"
+class="form-control <c:if test="">is-invalid</c:if>"
+name="point_${r.studentNo}"
+value="${r.point}"
+placeholder="">
 <c:if test="${not empty rowErrors[r.studentNo]}">
 <div style="color:#f0ad4e; font-size:0.9rem;">${rowErrors[r.studentNo]}</div>
-</c:if>
+ </c:if>
 </td>
 </tr>
 </c:forEach>
@@ -310,3 +309,6 @@ request.setAttribute("subjectName", subjectName);
 </section>
 </c:param>
 </c:import>
+ 
+ 
+ 
