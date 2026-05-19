@@ -40,15 +40,30 @@
 				<div class="mb-3">
 					<label class="form-label">パスワード</label>
 					<input
+						id="password"
 						class="form-control"
 						type="password"
 						name="password"
 						required />
 				</div>
 
-				<div class="mb-3">
-					<input type="checkbox" name="chk_d_ps"> パスワードを表示
-				</div>
+				
+	<div class="mb-3">
+    	<input type="checkbox" id="showPassword"> パスワードを表示
+	</div>
+
+	<script>
+	document.getElementById("showPassword").addEventListener("change", function() {
+    	const pw = document.getElementById("password");
+
+    	if (this.checked) {
+        	pw.type = "text";   // 表示する
+    	} else {
+        	pw.type = "password"; // 伏字に戻す
+    	}
+	});
+	</script>
+				
 
 				<div class="d-grid">
 					<input
