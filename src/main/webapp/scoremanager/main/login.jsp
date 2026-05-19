@@ -48,7 +48,7 @@
 				</div>
 
 				
-	<div class="mb-3">
+	<div class="mb-3 text-center">
     	<input type="checkbox" id="showPassword"> パスワードを表示
 	</div>
 
