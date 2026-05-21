@@ -5,7 +5,7 @@
 
 <c:import url="/common/base.jsp">
 	<c:param name="title">
-		得点管理システム | ログイン
+
 	</c:param>
 
 	<c:param name="scripts"></c:param>
