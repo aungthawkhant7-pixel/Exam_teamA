@@ -30,7 +30,7 @@ public class LoginExecuteAction extends Action {
 
 		} else {
 			List<String> errors = new ArrayList<>();
-			errors.add("IDまたはパスワードが確認できませんでした");
+			errors.add("ログインに失敗しました。IDまたはパスワードが正しくありません。");
 
 			req.setAttribute("errors", errors);
 			req.setAttribute("id", id);
