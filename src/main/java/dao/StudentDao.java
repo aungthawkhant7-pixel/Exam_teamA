@@ -41,6 +41,24 @@ public class StudentDao extends Dao {
         return student;
     }
 
+    public boolean exists(String no) throws Exception {
+        String sql = "SELECT COUNT(*) FROM STUDENT WHERE NO = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, no);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public List<Student> filter(String schoolCd, Integer entYear, String classNum, boolean isAttend) throws Exception {
         List<Student> list = new ArrayList<>();
 

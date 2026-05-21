@@ -2,76 +2,145 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <c:import url="/common/base.jsp">
+
 <c:param name="title">学生情報変更</c:param>
 
 <c:param name="content">
 
 <section class="me-4">
 
-    <h2 class="h3 mb-3 fw-normal bg-secondary bg-opacity-10 py-2 px-4">
+    <!-- タイトル -->
+    <h2 class="h3 mb-4 fw-bold bg-secondary bg-opacity-10 py-2 px-4">
         学生情報変更
     </h2>
 
+    <!-- フォーム -->
     <form method="post" action="StudentUpdateExecute.action">
 
-        <div class="row border mx-3 mb-3 py-3 rounded">
+        <!-- 入学年度 -->
+        <div class="mb-4">
+            <label class="form-label">入学年度</label>
 
-            <!-- 学生番号 -->
-            <div class="col-12 mb-3">
-                <label class="form-label">学生番号</label>
-                <input type="text" class="form-control" 
-                       value="${student.no}" readonly>
-                <input type="hidden" name="no" value="${student.no}">
-            </div>
+            <select name="entYear" class="form-select">
 
-            <!-- 氏名 -->
-            <div class="col-12 mb-3">
-                <label class="form-label">氏名</label>
-                <input type="text" name="name" class="form-control"
-                       value="${student.name}" required>
-            </div>
+                <option value="2022"
+                    <c:if test="${student.entYear == 2022}">
+                        selected
+                    </c:if>>
+                    2022
+                </option>
 
-            <!-- 入学年度 -->
-            <div class="col-6 mb-3">
-                <label class="form-label">入学年度</label>
-                <input type="number" name="entYear" class="form-control"
-                       value="${student.entYear}" required>
-            </div>
+                <option value="2023"
+                    <c:if test="${student.entYear == 2023}">
+                        selected
+                    </c:if>>
+                    2023
+                </option>
 
-            <!-- クラス -->
-            <div class="col-6 mb-3">
-                <label class="form-label">クラス</label>
-                <input type="text" name="classNum" class="form-control"
-                       value="${student.classNum}" required>
-            </div>
+                <option value="2024"
+                    <c:if test="${student.entYear == 2024}">
+                        selected
+                    </c:if>>
+                    2024
+                </option>
 
-            <!-- 在学中 -->
-            <div class="col-12 mb-3">
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="isAttend"
-                           value="true"
-                           id="isAttend"
-                           <c:if test="${student.attend}">checked</c:if>>
+                <option value="2025"
+                    <c:if test="${student.entYear == 2025}">
+                        selected
+                    </c:if>>
+                    2025
+                </option>
 
-                    <label class="form-check-label" for="isAttend">
-                        在学中
-                    </label>
-                </div>
-            </div>
+            </select>
+        </div>
 
-            <!-- ボタン -->
-            <div class="col-12 text-center mt-3">
-                <button class="btn btn-primary" type="submit">
-                    変更
-                </button>
+        <!-- 学生番号 -->
+        <div class="mb-4">
+            <label class="form-label">学生番号</label>
 
-                <a href="StudentList.action" class="btn btn-secondary ms-2">
-                    戻る
-                </a>
-            </div>
+            <input type="text"
+                   name="no"
+                   class="form-control"
+                   value="${student.no}"
+                   required>
+        </div>
 
+        <!-- 氏名 -->
+        <div class="mb-4">
+            <label class="form-label">氏名</label>
+
+            <input type="text"
+                   name="name"
+                   class="form-control"
+                   value="${student.name}"
+                   required>
+        </div>
+
+        <!-- クラス -->
+        <div class="mb-4">
+            <label class="form-label">クラス</label>
+
+            <select name="classNum" class="form-select">
+
+                <option value="101"
+                    <c:if test="${student.classNum == '101'}">
+                        selected
+                    </c:if>>
+                    101
+                </option>
+
+                <option value="102"
+                    <c:if test="${student.classNum == '102'}">
+                        selected
+                    </c:if>>
+                    102
+                </option>
+
+                <option value="201"
+                    <c:if test="${student.classNum == '201'}">
+                        selected
+                    </c:if>>
+                    201
+                </option>
+
+                <option value="202"
+                    <c:if test="${student.classNum == '202'}">
+                        selected
+                    </c:if>>
+                    202
+                </option>
+
+            </select>
+        </div>
+
+        <!-- 在学中 -->
+        <div class="form-check mb-4">
+
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="isAttend"
+                   value="true"
+                   id="isAttend"
+                   <c:if test="${student.attend}">
+                       checked
+                   </c:if>>
+
+            <label class="form-check-label" for="isAttend">
+                在学中
+            </label>
+
+        </div>
+
+        <!-- ボタン -->
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">
+                変更
+            </button>
+        </div>
+
+        <!-- 戻る -->
+        <div>
+            <a href="StudentList.action">戻る</a>
         </div>
 
     </form>
@@ -79,4 +148,5 @@
 </section>
 
 </c:param>
+
 </c:import>

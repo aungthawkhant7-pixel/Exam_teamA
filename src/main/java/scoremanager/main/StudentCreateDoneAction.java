@@ -5,7 +5,6 @@ import bean.Teacher;
 import dao.StudentDao;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import tool.Action;
 
 public class StudentCreateDoneAction extends Action {
@@ -13,65 +12,55 @@ public class StudentCreateDoneAction extends Action {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        request.setCharacterEncoding("UTF-8");
+        Teacher teacher = (Teacher) request.getSession().getAttribute("user");
 
-        HttpSession session = request.getSession();
-        Teacher teacher = (Teacher) session.getAttribute("user");
+        if (teacher == null) {
+            return "../login.jsp";
+        }
 
-        String entYearStr = request.getParameter("entYear");
+        String entYear = request.getParameter("entYear");
         String no = request.getParameter("no");
         String name = request.getParameter("name");
         String classNum = request.getParameter("classNum");
 
-        request.setAttribute("entYear", entYearStr);
+        request.setAttribute("entYear", entYear);
         request.setAttribute("no", no);
         request.setAttribute("name", name);
         request.setAttribute("classNum", classNum);
 
-        boolean hasError = false;
+        boolean error = false;
 
-        if (entYearStr == null || entYearStr.isEmpty()) {
+        if (entYear == null || entYear.isEmpty()) {
             request.setAttribute("entYearError", "入学年度を選択してください");
-            hasError = true;
+            error = true;
         }
 
-        if (no == null || no.trim().isEmpty()) {
-            request.setAttribute("noError", "学生番号を入力してください");
-            hasError = true;
+        if (no == null || no.isEmpty()) {
+            error = true;
         }
 
-        if (name == null || name.trim().isEmpty()) {
-            request.setAttribute("nameError", "氏名を入力してください");
-            hasError = true;
+        if (name == null || name.isEmpty()) {
+            error = true;
         }
 
         StudentDao dao = new StudentDao();
 
-        if (no != null && !no.trim().isEmpty()) {
-            Student oldStudent = dao.get(no);
-
-            if (oldStudent != null) {
-                request.setAttribute("noError", "学生番号が重複しています");
-                hasError = true;
-            }
+        if (no != null && !no.isEmpty() && dao.exists(no)) {
+            request.setAttribute("noError", "学生番号が重複しています");
+            error = true;
         }
 
-        if (hasError) {
+        if (error) {
             return "scoremanager/main/student_create.jsp";
         }
 
         Student student = new Student();
+        student.setEntYear(Integer.parseInt(entYear));
         student.setNo(no);
         student.setName(name);
-        student.setEntYear(Integer.parseInt(entYearStr));
         student.setClassNum(classNum);
         student.setAttend(true);
-
-        if (teacher != null) {
-            student.setSchoolCd(teacher.getSchoolCd());
-        } else {
-            student.setSchoolCd("oom");
-        }
+        student.setSchoolCd(teacher.getSchoolCd());
 
         dao.save(student);
 
