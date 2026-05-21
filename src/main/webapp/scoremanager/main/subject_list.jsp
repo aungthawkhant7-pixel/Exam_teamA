@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
-
 <c:import url="/common/base.jsp">
     <c:param name="title">科目管理</c:param>
     <c:param name="content">
@@ -8,18 +7,15 @@
             <h2 class="h3 mb-3 fw-normal bg-secondary bg-opacity-10 py-2 px-4">
                 科目管理
             </h2>
-            
             <c:if test="${not empty flash}">
                 <div class="alert alert-success mx-4">${flash}</div>
             </c:if>
             <c:if test="${not empty errorMsg}">
                 <div class="alert alert-danger mx-4">${errorMsg}</div>
             </c:if>
-
             <div class="mx-4 mb-3 text-end">
                 <a href="${pageContext.request.contextPath}/SubjectRegist.action">新規登録</a>
             </div>
-
             <div class="px-4">
                 <table class="table table-bordered table-striped align-middle">
                     <thead>
