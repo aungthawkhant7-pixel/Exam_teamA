@@ -11,9 +11,24 @@
 
         <section class="me-4">
 
-            <!-- タイトル -->
             <h2 class="h3 mb-3 fw-normal bg-secondary bg-opacity-10 py-2 px-4">
-                成績参照
+
+                <c:choose>
+
+                    <c:when test="${searchType eq 'subject'}">
+                        成績一覧（科目）
+                    </c:when>
+
+                    <c:when test="${searchType eq 'student'}">
+                        成績一覧（学生）
+                    </c:when>
+
+                    <c:otherwise>
+                        成績参照
+                    </c:otherwise>
+
+                </c:choose>
+
             </h2>
 
             <div class="px-4">
@@ -29,7 +44,6 @@
                         <div class="row align-items-center g-3"
                              style="min-height:90px;">
 
-                            <!-- 科目情報 -->
                             <div class="col-md-2 d-flex justify-content-center align-items-center">
 
                                 <span class="fw-bold">
@@ -54,7 +68,7 @@
                                     <c:forEach var="year" items="${entYearSet}">
 
                                         <option value="${year}"
-                                            <c:if test="${year == entYear}">
+                                            <c:if test="${empty searchType and year == entYear}">
                                                 selected
                                             </c:if>>
 
@@ -84,7 +98,7 @@
                                     <c:forEach var="num" items="${classNumSet}">
 
                                         <option value="${num}"
-                                            <c:if test="${num == classNum}">
+                                            <c:if test="${empty searchType and num == classNum}">
                                                 selected
                                             </c:if>>
 
@@ -114,7 +128,7 @@
                                     <c:forEach var="subject" items="${subjectSet}">
 
                                         <option value="${subject.cd}"
-                                            <c:if test="${subject.cd == subjectCd}">
+                                            <c:if test="${empty searchType and subject.cd == subjectCd}">
                                                 selected
                                             </c:if>>
 
@@ -163,7 +177,6 @@
                         <div class="row align-items-center g-3"
                              style="min-height:80px;">
 
-                            <!-- 学生情報 -->
                             <div class="col-md-2 d-flex justify-content-center align-items-center">
 
                                 <span class="fw-bold">
@@ -311,8 +324,8 @@
                                 <th>クラス</th>
                                 <th>学生番号</th>
                                 <th>氏名</th>
-                                <th>回数</th>
-                                <th>点数</th>
+                                <th>1回</th>
+                                <th>2回</th>
                             </tr>
 
                         </thead>
@@ -340,11 +353,11 @@
                                     </td>
 
                                     <td>
-                                        <c:out value="${r.testNo}"/>
+                                        <c:out value="${r.point1}"/>
                                     </td>
 
                                     <td>
-                                        <c:out value="${r.point}"/>
+                                        <c:out value="${r.point2}"/>
                                     </td>
 
                                 </tr>

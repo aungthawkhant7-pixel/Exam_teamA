@@ -120,13 +120,14 @@ public class TestScoreDAO extends Dao {
         List<Map<String, String>> list = new ArrayList<>();
 
         String sql =
-            "SELECT SU.NAME AS SUBJECT_NAME, TS.SUBJECT_CD, TS.TEST_NO, TS.POINT " +
-            "FROM TEST_SCORE TS " +
-            "LEFT JOIN SUBJECT SU ON TRIM(TS.SUBJECT_CD)=TRIM(SU.CD) " +
-            "AND TRIM(TS.SCHOOL_CD)=TRIM(SU.SCHOOL_CD) " +
-            "WHERE TRIM(TS.SCHOOL_CD)=TRIM(?) " +
-            "AND TRIM(TS.STUDENT_NO)=TRIM(?) " +
-            "ORDER BY TS.SUBJECT_CD, TS.TEST_NO";
+            "SELECT SU.NAME AS SUBJECT_NAME, TS.SUBJECT_CD, TS.TEST_NO, TS.POINT "
+          + "FROM TEST_SCORE TS "
+          + "LEFT JOIN SUBJECT SU "
+          + "ON TRIM(TS.SUBJECT_CD)=TRIM(SU.CD) "
+          + "AND TRIM(TS.SCHOOL_CD)=TRIM(SU.SCHOOL_CD) "
+          + "WHERE TRIM(TS.SCHOOL_CD)=TRIM(?) "
+          + "AND TRIM(TS.STUDENT_NO)=TRIM(?) "
+          + "ORDER BY TS.SUBJECT_CD, TS.TEST_NO";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -154,16 +155,23 @@ public class TestScoreDAO extends Dao {
         List<Map<String, String>> list = new ArrayList<>();
 
         String sql =
-            "SELECT ST.ENT_YEAR, ST.CLASS_NUM, ST.NO AS STUDENT_NO, " +
-            "ST.NAME AS STUDENT_NAME, TS.TEST_NO, TS.POINT " +
-            "FROM TEST_SCORE TS " +
-            "LEFT JOIN STUDENT ST ON TRIM(TS.STUDENT_NO)=TRIM(ST.NO) " +
-            "AND TRIM(TS.SCHOOL_CD)=TRIM(ST.SCHOOL_CD) " +
-            "WHERE TRIM(TS.SCHOOL_CD)=TRIM(?) " +
-            "AND TRIM(ST.ENT_YEAR)=TRIM(?) " +
-            "AND TRIM(ST.CLASS_NUM)=TRIM(?) " +
-            "AND TRIM(TS.SUBJECT_CD)=TRIM(?) " +
-            "ORDER BY ST.NO, TS.TEST_NO";
+            "SELECT "
+          + "ST.ENT_YEAR, "
+          + "ST.CLASS_NUM, "
+          + "ST.NO AS STUDENT_NO, "
+          + "ST.NAME AS STUDENT_NAME, "
+          + "MAX(CASE WHEN TS.TEST_NO = 1 THEN TS.POINT END) AS POINT1, "
+          + "MAX(CASE WHEN TS.TEST_NO = 2 THEN TS.POINT END) AS POINT2 "
+          + "FROM TEST_SCORE TS "
+          + "INNER JOIN STUDENT ST "
+          + "ON TRIM(TS.STUDENT_NO)=TRIM(ST.NO) "
+          + "AND TRIM(TS.SCHOOL_CD)=TRIM(ST.SCHOOL_CD) "
+          + "WHERE TRIM(TS.SCHOOL_CD)=TRIM(?) "
+          + "AND TRIM(ST.ENT_YEAR)=TRIM(?) "
+          + "AND TRIM(ST.CLASS_NUM)=TRIM(?) "
+          + "AND TRIM(TS.SUBJECT_CD)=TRIM(?) "
+          + "GROUP BY ST.ENT_YEAR, ST.CLASS_NUM, ST.NO, ST.NAME "
+          + "ORDER BY ST.NO";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -180,8 +188,8 @@ public class TestScoreDAO extends Dao {
                     row.put("classNum", rs.getString("CLASS_NUM"));
                     row.put("studentNo", rs.getString("STUDENT_NO"));
                     row.put("studentName", rs.getString("STUDENT_NAME"));
-                    row.put("testNo", rs.getString("TEST_NO"));
-                    row.put("point", rs.getString("POINT"));
+                    row.put("point1", rs.getString("POINT1"));
+                    row.put("point2", rs.getString("POINT2"));
                     list.add(row);
                 }
             }
