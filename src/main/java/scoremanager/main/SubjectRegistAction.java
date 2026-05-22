@@ -35,6 +35,7 @@ public class SubjectRegistAction extends Action {
 
             cd = cd.trim();
             name = name.trim();
+            originalCd = originalCd.trim();
 
             Subject subject = new Subject();
             subject.setCd(cd);
@@ -43,18 +44,28 @@ public class SubjectRegistAction extends Action {
 
             try {
                 if (originalCd.isEmpty()) {
+
+                    Subject exists = dao.get(cd, schoolCd);
+                    if (exists != null) {
+                        request.setAttribute("errorMsg", "科目コードが重複している可能性があります。");
+                        request.setAttribute("subject", subject);
+                        request.setAttribute("originalCd", originalCd);
+                        return "scoremanager/main/subject_regist.jsp";
+                    }
+
                     dao.insert(subject);
+
                 } else {
                     dao.update(subject, originalCd);
                 }
 
-                return "SubjectList.action";
+                response.sendRedirect(request.getContextPath() + "/SubjectList.action");
+                return null;
 
             } catch (Exception e) {
-                request.setAttribute("errorMsg", originalCd.isEmpty()
-                        ? "登録に失敗しました。"
-                        : "更新に失敗しました。");
+                e.printStackTrace();
 
+                request.setAttribute("errorMsg", "登録に失敗しました。原因：" + e.getMessage());
                 request.setAttribute("subject", subject);
                 request.setAttribute("originalCd", originalCd);
 
@@ -66,7 +77,6 @@ public class SubjectRegistAction extends Action {
 
         if (editCd != null && !editCd.isEmpty()) {
             Subject subject = dao.get(editCd, schoolCd);
-
             request.setAttribute("subject", subject);
             request.setAttribute("originalCd", editCd);
         }
